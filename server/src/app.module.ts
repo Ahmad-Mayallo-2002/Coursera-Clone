@@ -15,6 +15,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-yet';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { EnrollmentModule } from './enrollment/enrollment.module';
+import { RatingModule } from './rating/rating.module';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    EnrollmentModule,
+    RatingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

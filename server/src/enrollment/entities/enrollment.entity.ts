@@ -1,5 +1,5 @@
+import { User } from 'src/user/entities/user.entity';
 import { Course } from 'src/course/entities/course.entity';
-import { Video } from 'src/video/entities/video.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -10,21 +10,20 @@ import {
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { OneToMany } from 'typeorm/browser';
 
-@Entity('playlists')
-export class Playlist {
+@Entity('enrollments')
+export class Enrollment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  title: string;
-
-  @Column({ type: 'text', length: 5000 })
-  description: string;
+  @Column({ type: 'varchar', length: 100, name: 'user_id' })
+  userId: string;
 
   @Column({ type: 'varchar', length: 100, name: 'course_id' })
   courseId: string;
+
+  @Column({ type: 'float', default: 0, precision: 3, scale: 2 })
+  progress: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -33,10 +32,11 @@ export class Playlist {
   updatedAt: Date;
 
   // Relationships
-  @ManyToOne(() => Course, (course) => course.playlists)
+  @ManyToOne(() => User, (user) => user.enrollments)
+  @JoinColumn({ name: 'user' })
+  user: Relation<User>;
+
+  @ManyToOne(() => Course, (course) => course.enrollments)
   @JoinColumn({ name: 'course' })
   course: Relation<Course>;
-
-  @OneToMany(() => Video, (video) => video.playlist)
-  videos: Relation<Video[]>;
 }
