@@ -1,10 +1,10 @@
-import { Category } from 'src/category/entities/category.entity';
-import { Enrollment } from 'src/enrollment/entities/enrollment.entity';
-import { CourseLevel } from 'src/enum/courseLevel';
-import { Playlist } from 'src/playlist/entities/playlist.entity';
-import { Rating } from 'src/rating/entities/rating.entity';
-import { Teacher } from 'src/teacher/entities/teacher.entity';
-import { Video } from 'src/video/entities/video.entity';
+import { Category } from '../../category/entities/category.entity';
+import { Enrollment } from '../../enrollment/entities/enrollment.entity';
+import { CourseLevel } from '../../enum/courseLevel';
+import { Playlist } from '../../playlist/entities/playlist.entity';
+import { Rating } from '../../rating/entities/rating.entity';
+import { Teacher } from '../../teacher/entities/teacher.entity';
+import { Video } from '../../video/entities/video.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -25,7 +25,7 @@ export class Course {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'text', length: 5000 })
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ type: 'varchar', length: 255 })

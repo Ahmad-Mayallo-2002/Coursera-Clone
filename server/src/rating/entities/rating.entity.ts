@@ -1,7 +1,7 @@
-import { Course } from 'src/course/entities/course.entity';
-import { RatingType } from 'src/enum/ratingType.enum';
-import { Teacher } from 'src/teacher/entities/teacher.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Course } from '../../course/entities/course.entity';
+import { RatingType } from '../../enum/ratingType.enum';
+import { Teacher } from '../../teacher/entities/teacher.entity';
+import { User } from '../../user/entities/user.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,

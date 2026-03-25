@@ -1,6 +1,6 @@
-import { Course } from 'src/course/entities/course.entity';
-import { Rating } from 'src/rating/entities/rating.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Course } from '../../course/entities/course.entity';
+import { Rating } from '../../rating/entities/rating.entity';
+import { User } from '../../user/entities/user.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -18,10 +18,10 @@ export class Teacher {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ type: 'text', length: 5000 })
+    @Column({ type: 'text' })
     bio: string;
 
-    @Column({ type: 'text', length: 5000 })
+    @Column({ type: 'text' })
     experience: string;
 
     @Column({ type: 'boolean', default: false })

@@ -1,5 +1,5 @@
-import { User } from 'src/user/entities/user.entity';
-import { Course } from 'src/course/entities/course.entity';
+import { User } from '../../user/entities/user.entity';
+import { Course } from '../../course/entities/course.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -22,7 +22,7 @@ export class Enrollment {
   @Column({ type: 'varchar', length: 100, name: 'course_id' })
   courseId: string;
 
-  @Column({ type: 'float', default: 0, precision: 3, scale: 2 })
+  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
   progress: number;
 
   @CreateDateColumn()

@@ -1,7 +1,7 @@
-import { Enrollment } from 'src/enrollment/entities/enrollment.entity';
-import { Role } from 'src/enum/role.enum';
-import { Rating } from 'src/rating/entities/rating.entity';
-import { Teacher } from 'src/teacher/entities/teacher.entity';
+import { Enrollment } from '../../enrollment/entities/enrollment.entity';
+import { Role } from '../../enum/role.enum';
+import { Rating } from '../../rating/entities/rating.entity';
+import { Teacher } from '../../teacher/entities/teacher.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

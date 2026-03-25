@@ -1,5 +1,5 @@
-import { Course } from 'src/course/entities/course.entity';
-import { Playlist } from 'src/playlist/entities/playlist.entity';
+import { Course } from '../../course/entities/course.entity';
+import { Playlist } from '../../playlist/entities/playlist.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -19,7 +19,7 @@ export class Video {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'text', length: 5000 })
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ type: 'varchar', length: 255 })

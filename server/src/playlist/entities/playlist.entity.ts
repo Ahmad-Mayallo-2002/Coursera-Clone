@@ -1,16 +1,16 @@
-import { Course } from 'src/course/entities/course.entity';
-import { Video } from 'src/video/entities/video.entity';
+import { Course } from '../../course/entities/course.entity';
+import { Video } from '../../video/entities/video.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   type Relation,
   UpdateDateColumn,
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { OneToMany } from 'typeorm/browser';
 
 @Entity('playlists')
 export class Playlist {
@@ -20,7 +20,7 @@ export class Playlist {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column({ type: 'text', length: 5000 })
+  @Column({ type: 'text' })
   description: string;
 
   @Column({ type: 'varchar', length: 100, name: 'course_id' })

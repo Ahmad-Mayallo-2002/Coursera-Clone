@@ -1,4 +1,4 @@
-import { Course } from 'src/course/entities/course.entity';
+import { Course } from '../../course/entities/course.entity'
 import {
   Entity,
   PrimaryGeneratedColumn,
