@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { User } from '../user/entities/user.entity';
+import type { Request } from 'express';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { RefreshAuthGuard } from './guards/refresh-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  async login(@Body() body: LoginDto) {
+    const result = await this.authService.login(body);
+    return result
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
+  @Post('register')
+  async register(@Body() body: RegisterDto): Promise<User> {
+    return this.authService.register(body);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  @Post('refresh')
+  @UseGuards(RefreshAuthGuard)
+  refresh(@Req() req: Request) {
+    const user = req.user as { id: string; refreshToken: string };
+    return this.authService.refreshTokens(user.id, user.refreshToken);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @Get('test')
+  @UseGuards(JwtAuthGuard)
+  test(@Req() req: Request) {
+    return { msg: "Protected Route" };
   }
 }

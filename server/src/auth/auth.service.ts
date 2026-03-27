@@ -1,26 +1,88 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
+import { Repository } from 'typeorm';
+import { RegisterDto } from './dto/register.dto';
+import { compare, hash } from 'bcryptjs';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private jwtService: JwtService,
+  ) { }
+
+  async register(input: RegisterDto): Promise<User> {
+    const user = await this.userRepo.findOneBy({ email: input.email });
+    if (user) throw new ConflictException('This Email is Already Exist');
+
+    const hashedPassword = await hash(input.password, 10);
+
+    const newUser = this.userRepo.create({
+      ...input,
+      password: hashedPassword,
+    });
+    return await this.userRepo.save(newUser);
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async login(input: LoginDto) {
+    const user = await this.validateUser(input);
+    return this.issueTokens(user);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  async validateUser(input: LoginDto): Promise<User> {
+    const user = await this.userRepo.findOneBy({ email: input.email });
+    if (!user) throw new UnauthorizedException('Incorrect Email or Password');
+
+    const comparePassword = await compare(input.password, user.password);
+    if (!comparePassword)
+      throw new UnauthorizedException('Incorrect Email or Password');
+
+    return user;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async issueTokens(user: User) {
+    const payload = { id: user.id, role: user.role };
+
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '1h',
+      secret: process.env.ACCESS_TOKEN_SECRET,
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '1d',
+      secret: process.env.REFRESH_TOKEN_SECRET,
+    });
+
+    const hashedRefreshToken = await hash(refreshToken, 10);
+    await this.userRepo.update({ id: user.id }, { refreshToken: hashedRefreshToken });
+
+    return {
+      accessToken,
+      refreshToken,
+      id: user.id,
+      role: user.role,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async refreshTokens(id: string, refreshToken: string) {
+    const user = await this.userRepo.findOne({
+      where: { id },
+      select: ['id', 'role', 'refreshToken'],
+    });
+
+    if (!user) throw new ForbiddenException('User Not Found');
+    if (!user.refreshToken) throw new ForbiddenException('Refresh Token Not Found');
+
+    const isMatch = await compare(refreshToken, user.refreshToken);
+    if (!isMatch) throw new ForbiddenException('Invalid Refresh Token');
+
+    return this.issueTokens(user as User);
   }
 }

@@ -27,6 +27,9 @@ export class User {
   @Column({ type: 'varchar', length: 100 })
   password: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
+  refreshToken: string;
+
   @Column({
     type: 'enum',
     enum: Role,
