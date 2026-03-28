@@ -16,43 +16,43 @@ import {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'varchar', length: 100 })
-  username: string;
+  username!: string;
 
   @Column({ type: 'varchar', length: 100 })
-  email: string;
+  email!: string;
 
   @Column({ type: 'varchar', length: 100 })
-  password: string;
+  password!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true, select: false })
-  refreshToken: string;
+  refreshToken!: string;
 
   @Column({
     type: 'enum',
     enum: Role,
     default: Role.STUDENT,
   })
-  role: Role;
+  role!: Role;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  image: string;
+  image!: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   // Relationships
   @OneToOne(() => Teacher, (teacher) => teacher.user)
-  teacher: Relation<Teacher>;
+  teacher!: Relation<Teacher>;
 
   @OneToMany(() => Rating, (rating) => rating.user)
-  ratings: Relation<Rating[]>;
+  ratings!: Relation<Rating[]>;
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.user)
-  enrollments: Relation<Enrollment[]>;
+  enrollments!: Relation<Enrollment[]>;
 }
