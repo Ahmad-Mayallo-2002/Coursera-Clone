@@ -1,7 +1,12 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,13 +16,17 @@ import { RegisterDto } from './dto/register.dto';
 import { compare, hash } from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { sendMail } from '../utils/sendMail';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    @Inject(CACHE_MANAGER) private cache: Cache,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async register(input: RegisterDto): Promise<User> {
     const user = await this.userRepo.findOneBy({ email: input.email });
@@ -61,7 +70,10 @@ export class AuthService {
     });
 
     const hashedRefreshToken = await hash(refreshToken, 10);
-    await this.userRepo.update({ id: user.id }, { refreshToken: hashedRefreshToken });
+    await this.userRepo.update(
+      { id: user.id },
+      { refreshToken: hashedRefreshToken },
+    );
 
     return {
       accessToken,
@@ -78,11 +90,39 @@ export class AuthService {
     });
 
     if (!user) throw new ForbiddenException('User Not Found');
-    if (!user.refreshToken) throw new ForbiddenException('Refresh Token Not Found');
+    if (!user.refreshToken)
+      throw new ForbiddenException('Refresh Token Not Found');
 
     const isMatch = await compare(refreshToken, user.refreshToken);
     if (!isMatch) throw new ForbiddenException('Invalid Refresh Token');
 
     return this.issueTokens(user as User);
+  }
+
+  async forgotPassword(email: string): Promise<string> {
+    const code = await sendMail(email);
+    await this.cache.set(`${code}`, email, 1000 * 60 * 15);
+    return 'Verification Code Sent Successfully';
+  }
+
+  async verifyCode(code: string): Promise<string> {
+    const email = (await this.cache.get(code)) as string;
+    if (!email || !code)
+      throw new BadRequestException('Invalid or Expired Verification Code');
+    await this.cache.del('code');
+    return email;
+  }
+
+  async resetPassword(input: ResetPasswordDto): Promise<boolean> {
+    const user = await this.userRepo.findOneBy({ email: input.email });
+    if (!user) throw new NotFoundException('User not Found');
+
+    if (!input.newPassword !== !input.confirmNewPassword)
+      throw new BadRequestException('Two Passwords Must Be Matched');
+
+    const hashedPassword = await hash(input.newPassword, 10);
+    await this.userRepo.update({ id: user.id }, { password: hashedPassword });
+
+    return true;
   }
 }

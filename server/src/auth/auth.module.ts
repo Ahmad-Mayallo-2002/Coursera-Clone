@@ -8,10 +8,15 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt-auth.strategy';
 import { RefreshStrategy } from './strategies/refresh-auth.strategy';
 import { LocalStrategy } from './strategies/local-auth.strategy';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, RefreshStrategy, LocalStrategy],
-  imports: [TypeOrmModule.forFeature([User]), PassportModule, JwtModule.register({})],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    PassportModule,
+    JwtModule.register({}),
+  ],
 })
 export class AuthModule {}
