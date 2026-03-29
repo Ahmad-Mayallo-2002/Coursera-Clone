@@ -7,7 +7,6 @@ import {
   Body,
   UseGuards,
   Query,
-  Post,
   Req,
   BadRequestException,
 } from '@nestjs/common';
@@ -21,7 +20,7 @@ import { Role } from '../enum/role.enum';
 import type { Request } from 'express';
 import { busboyUploader } from '../utils/busboyUploader';
 
-@Controller('user')
+@Controller('api')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -43,7 +42,6 @@ export class UserController {
   updateStudent(
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Req() req: Request,
   ) {
     return this.userService.updateUser(userId, updateUserDto);
   }
@@ -54,7 +52,7 @@ export class UserController {
     return this.userService.deleteUser(userId);
   }
 
-  @Post('update-user-image/:userId')
+  @Patch('update-user-image/:userId')
   @UseGuards(JwtAuthGuard, AdminOrOwner)
   async updateUserImage(@Param('userId') userId: string, @Req() req: Request) {
     try {
@@ -64,8 +62,7 @@ export class UserController {
       const imageUrl = `/uploads/${result.category}s/${result.fileName}`;
       return this.userService.updateStudentImage(userId, imageUrl);
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException(error ? error : 'Uploading Error');
+      throw new BadRequestException(error ?? 'Uploading Error');
     }
   }
 }

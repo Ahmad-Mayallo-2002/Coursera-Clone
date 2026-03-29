@@ -16,28 +16,28 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../enum/role.enum';
 
-@Controller('category')
+@Controller('api')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Get()
+  @Get('get-categories')
   getCategories() {
     return this.categoryService.findAll();
   }
 
-  @Get(':id')
+  @Get('get-categories/:id')
   getCategoryById(@Param('id') id: string) {
     return this.categoryService.findOne(id);
   }
 
-  @Post()
+  @Post('update-category/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   addCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Patch(':id')
+  @Patch('delete-category/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   updateCategory(

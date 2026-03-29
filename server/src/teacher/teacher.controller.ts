@@ -16,20 +16,21 @@ import { AdminOrOwner } from '../auth/guards/admin-or-owner.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../enum/role.enum';
 
-@Controller('teacher')
+@Controller('api')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
-  @Get()
+  @Get('get-teachers')
   getTeachers(@Query('take') take: number, @Query('skip') skip: number) {
     return this.teacherService.findAllTeachers(take, skip);
   }
 
-  @Get(':id')
+  @Get('get-teachers/:id')
   getTeacherById(@Param('id') id: string) {
     return this.teacherService.findTeacherById(id);
   }
 
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Patch('update-teacher/:userId')
   @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwner)
   updateTeacher(
@@ -46,6 +47,7 @@ export class TeacherController {
     return this.teacherService.unactiveTeacher(id);
   }
 
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Delete('delete-teacher/:userId')
   @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwner)
   deleteTeacher(@Param('userId') userId: string) {
