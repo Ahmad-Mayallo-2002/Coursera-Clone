@@ -27,6 +27,8 @@ import { RatingModule } from './rating/rating.module';
     PlaylistModule,
     VideoModule,
     AuthModule,
+    EnrollmentModule,
+    RatingModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -55,11 +57,9 @@ import { RatingModule } from './rating/rating.module';
       ttl: 1000 * 60 * 60 * 24,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
     }),
-    EnrollmentModule,
-    RatingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

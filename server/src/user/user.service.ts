@@ -13,7 +13,7 @@ import { hash } from 'bcryptjs';
 import { paginationCalculation } from '../utils/paginationCalculation';
 import { PaginatedData } from '../interfaces/pagination.interface';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import busboy from 'busboy';
+import { type Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -54,26 +54,37 @@ export class UserService {
     return student;
   }
 
-  async updateStudent(id: string, input: UpdateUserDto): Promise<User> {
+  async updateUser(
+    id: string,
+    input: UpdateUserDto,
+    req?: Request,
+  ): Promise<User> {
     const user = await this.findStudentById(id);
 
-    for (const key in input) {
-      if (key === 'password' && input[key])
-        user.password = await hash(input[key], 10);
-      if (key === 'email' && input[key]) {
-        const currentEmailUser = await this.userRepo.findOneBy({
-          email: input[key],
-        });
-        if (currentEmailUser)
-          throw new ConflictException('This Email is Already Used');
-      }
-      if (input[key]) user[key] = input[key];
+    if (input.password) user.password = await hash(input.password, 10);
+    if (input.email) {
+      const currentEmailUser = await this.userRepo.findOneBy({
+        email: input.email,
+      });
+      if (currentEmailUser)
+        throw new ConflictException('This Email is Already Used');
     }
+    if (input.username) user.username = input.username;
 
-    return await this.userRepo.save(user);
+    const savedStudent = await this.userRepo.save(user);
+    await this.cache.set(`student-${id}`, savedStudent, 1000 * 60 * 60 * 24);
+    return savedStudent;
   }
 
-  async deleteStudent(id: string) {
+  async updateStudentImage(id: string, image: string): Promise<User> {
+    const student = await this.findStudentById(id);
+    student.image = image;
+    const savedStudent = await this.userRepo.save(student);
+    await this.cache.set(`student-${id}`, savedStudent, 1000 * 60 * 60 * 24);
+    return savedStudent;
+  }
+
+  async deleteUser(id: string) {
     const student = await this.findStudentById(id);
     await this.userRepo.remove(student);
     return true;

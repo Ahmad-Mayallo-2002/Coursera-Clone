@@ -7,6 +7,9 @@ import {
   Body,
   UseGuards,
   Query,
+  Post,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,6 +18,8 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { AdminOrOwner } from '../auth/guards/admin-or-owner.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../enum/role.enum';
+import type { Request } from 'express';
+import { busboyUploader } from '../utils/busboyUploader';
 
 @Controller('user')
 export class UserController {
@@ -33,18 +38,37 @@ export class UserController {
     return this.userService.findStudentById(userId);
   }
 
-  @Patch('update-student/:userId')
+  @Patch('update-user/:userId')
   @UseGuards(JwtAuthGuard, AdminOrOwner)
   updateStudent(
     @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
+    @Req() req: Request,
   ) {
-    return this.userService.updateStudent(userId, updateUserDto);
+    return this.userService.updateUser(userId, updateUserDto);
   }
 
-  @Delete('delete-student/:userId')
+  @Delete('delete-user/:userId')
   @UseGuards(JwtAuthGuard, AdminOrOwner)
-  deleteStudent(@Param('userId') userId: string) {
-    return this.userService.deleteStudent(userId);
+  updateUser(@Param('userId') userId: string) {
+    return this.userService.deleteUser(userId);
+  }
+
+  @Post('update-user-image/:userId')
+  @UseGuards(JwtAuthGuard, AdminOrOwner)
+  async updateUserImage(
+    @Param('userId') userId: string,
+    @Req() req: Request,
+  ) {
+    try {
+      const result = await busboyUploader(req);
+      if (result.category !== 'image')
+        throw new BadRequestException('Only image uploads are allowed');
+
+      const imageUrl = `/uploads/${result.category}s/${result.fileName}`;
+      return this.userService.updateStudentImage(userId, imageUrl);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }
