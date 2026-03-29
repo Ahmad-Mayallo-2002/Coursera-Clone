@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TeacherService } from './teacher.service';
-import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { AdminOrOwner } from '../auth/guards/admin-or-owner.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../enum/role.enum';
 
 @Controller('teacher')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
-  @Post()
-  create(@Body() createTeacherDto: CreateTeacherDto) {
-    return this.teacherService.create(createTeacherDto);
-  }
-
   @Get()
-  findAll() {
-    return this.teacherService.findAll();
+  getTeachers(@Query('take') take: number, @Query('skip') skip: number) {
+    return this.teacherService.findAllTeachers(take, skip);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.teacherService.findOne(+id);
+  getTeacherById(@Param('id') id: string) {
+    return this.teacherService.findTeacherById(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
-    return this.teacherService.update(+id, updateTeacherDto);
+  @Patch('update-teacher/:userId')
+  @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwner)
+  updateTeacher(
+    @Param('userId') userId: string,
+    @Body() updateTeacherDto: UpdateTeacherDto,
+  ) {
+    return this.teacherService.updateTeacherByUserId(userId, updateTeacherDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.teacherService.remove(+id);
+  @Patch('unactive-teacher/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  unactiveTeacher(@Param('id') id: string) {
+    return this.teacherService.unactiveTeacher(id);
+  }
+
+  @Delete('delete-teacher/:userId')
+  @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwner)
+  deleteTeacher(@Param('userId') userId: string) {
+    return this.teacherService.deleteTeacherByUserId(userId);
   }
 }

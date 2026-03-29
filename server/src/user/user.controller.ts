@@ -56,19 +56,16 @@ export class UserController {
 
   @Post('update-user-image/:userId')
   @UseGuards(JwtAuthGuard, AdminOrOwner)
-  async updateUserImage(
-    @Param('userId') userId: string,
-    @Req() req: Request,
-  ) {
+  async updateUserImage(@Param('userId') userId: string, @Req() req: Request) {
     try {
       const result = await busboyUploader(req);
       if (result.category !== 'image')
         throw new BadRequestException('Only image uploads are allowed');
-
       const imageUrl = `/uploads/${result.category}s/${result.fileName}`;
       return this.userService.updateStudentImage(userId, imageUrl);
     } catch (error) {
-      throw new BadRequestException(error);
+      console.log(error);
+      throw new BadRequestException(error ? error : 'Uploading Error');
     }
   }
 }

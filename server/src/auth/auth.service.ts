@@ -19,6 +19,8 @@ import { JwtService } from '@nestjs/jwt';
 import { sendMail } from '../utils/sendMail';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { Role } from '../enum/role.enum';
+import { Payload } from '../interfaces/payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -47,7 +49,10 @@ export class AuthService {
   }
 
   async validateUser(input: LoginDto): Promise<User> {
-    const user = await this.userRepo.findOneBy({ email: input.email });
+    const user = await this.userRepo.findOne({
+      where: { email: input.email },
+      relations: { teacher: true },
+    });
     if (!user) throw new UnauthorizedException('Incorrect Email or Password');
 
     const comparePassword = await compare(input.password, user.password);
@@ -58,7 +63,12 @@ export class AuthService {
   }
 
   async issueTokens(user: User) {
-    const payload = { id: user.id, role: user.role };
+    const payload: Payload = {
+      id: user.id,
+      role: user.role,
+    };
+
+    if (user.role === Role.TEACHER) payload.teacherId = user.teacher.id;
 
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: '1h',

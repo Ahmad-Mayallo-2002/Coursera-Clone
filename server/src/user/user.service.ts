@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -13,7 +14,8 @@ import { hash } from 'bcryptjs';
 import { paginationCalculation } from '../utils/paginationCalculation';
 import { PaginatedData } from '../interfaces/pagination.interface';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { type Request } from 'express';
+import { unlink } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class UserService {
@@ -54,11 +56,7 @@ export class UserService {
     return student;
   }
 
-  async updateUser(
-    id: string,
-    input: UpdateUserDto,
-    req?: Request,
-  ): Promise<User> {
+  async updateUser(id: string, input: UpdateUserDto): Promise<User> {
     const user = await this.findStudentById(id);
 
     if (input.password) user.password = await hash(input.password, 10);

@@ -26,9 +26,10 @@ export const busboyUploader = (req: Request): Promise<UploadResult> => {
       file.pipe(writeStream);
 
       writeStream.on('error', (error) => reject(error));
-      writeStream.on('finish', () => {
-        uploaded = { fileName, filePath, category };
-      });
+      writeStream.on(
+        'finish',
+        () => (uploaded = { fileName, filePath, category }),
+      );
     });
 
     bb.on('error', (error) => reject(error));
