@@ -16,37 +16,37 @@ import {
 @Entity('teachers')
 export class Teacher {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
     @Column({ type: 'text' })
-    bio: string;
+    bio!: string;
 
     @Column({ type: 'text' })
-    experience: string;
+    experience!: string;
 
     @Column({ type: 'boolean', default: false })
-    isActive: boolean;
+    isActive!: boolean;
 
     @Column({ type: 'float', default: 0 })
-    rating: number;
+    rating!: number;
 
     @Column({ type: 'varchar', length: 100, name: 'user_id' })
-    userId: string;
+    userId!: string;
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt!: Date;
 
     @UpdateDateColumn()
-    updatedAt: Date;
+    updatedAt!: Date;
 
     // Relationships
     @OneToOne(() => User, (user) => user.teacher)
     @JoinColumn({ name: 'user' })
-    user: Relation<User>;
+    user!: Relation<User>;
 
     @OneToMany(() => Course, (course) => course.teacher)
-    courses: Relation<Course[]>;
+    courses!: Relation<Course[]>;
 
     @OneToMany(() => Rating, (rating) => rating.teacher)
-    ratings: Relation<Rating[]>;
+    ratings!: Relation<Rating[]>;
 }

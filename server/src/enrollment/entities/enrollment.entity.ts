@@ -14,29 +14,29 @@ import {
 @Entity('enrollments')
 export class Enrollment {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'varchar', length: 100, name: 'user_id' })
-  userId: string;
+  userId!: string;
 
   @Column({ type: 'varchar', length: 100, name: 'course_id' })
-  courseId: string;
+  courseId!: string;
 
   @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
-  progress: number;
+  progress!: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   // Relationships
   @ManyToOne(() => User, (user) => user.enrollments)
   @JoinColumn({ name: 'user' })
-  user: Relation<User>;
+  user!: Relation<User>;
 
   @ManyToOne(() => Course, (course) => course.enrollments)
   @JoinColumn({ name: 'course' })
-  course: Relation<Course>;
+  course!: Relation<Course>;
 }

@@ -20,56 +20,56 @@ import {
 @Entity('courses')
 export class Course {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  title: string;
+  title!: string;
 
   @Column({ type: 'text' })
-  description: string;
+  description!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  image: string;
+  image!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  price: number;
+  price!: number;
 
   @Column({ type: 'enum', enum: CourseLevel })
-  level: CourseLevel;
+  level!: CourseLevel;
 
   @Column({ type: 'varchar', length: 100, name: 'teacher_id' })
-  teacherId: string;
+  teacherId!: string;
 
   @Column({ type: 'varchar', length: 100, name: 'category_id' })
-  categoryId: string;
+  categoryId!: string;
 
   @Column({ type: 'float', default: 0 })
-  rating: number;
+  rating!: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   // Relationships
   @ManyToOne(() => Teacher, (teacher) => teacher.courses)
   @JoinColumn({ name: 'teacher' })
-  teacher: Relation<Teacher>;
+  teacher!: Relation<Teacher>;
 
   @ManyToOne(() => Category, (category) => category.courses)
   @JoinColumn({ name: 'category' })
-  category: Relation<Category>;
+  category!: Relation<Category>;
 
   @OneToMany(() => Rating, (rating) => rating.course)
-  ratings: Relation<Rating[]>;
+  ratings!: Relation<Rating[]>;
 
   @OneToMany(() => Playlist, (playlist) => playlist.course)
-  playlists: Relation<Playlist[]>;
+  playlists!: Relation<Playlist[]>;
 
   @OneToMany(() => Video, (video) => video.course)
-  videos: Relation<Video[]>;
+  videos!: Relation<Video[]>;
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
-  enrollments: Relation<Enrollment[]>;
+  enrollments!: Relation<Enrollment[]>;
 }

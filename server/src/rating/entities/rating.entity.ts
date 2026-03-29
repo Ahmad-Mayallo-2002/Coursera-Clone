@@ -16,39 +16,39 @@ import {
 @Entity('ratings')
 export class Rating {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
     @Column({ type: 'float', default: 0 })
-    value: number;
+    value!: number;
 
     @Column({ type: 'enum', enum: RatingType })
-    type: RatingType;
+    type!: RatingType;
 
     @Column({ type: 'varchar', length: 100, name: 'user_id' })
-    userId: string;
+    userId!: string;
 
     @Column({ type: 'varchar', length: 100, name: 'course_id', nullable: true })
-    courseId: string;
+    courseId!: string;
 
     @Column({ type: 'varchar', length: 100, name: 'teacher_id', nullable: true })
-    teacherId: string;
+    teacherId!: string;
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt!: Date;
 
     @UpdateDateColumn()
-    updatedAt: Date;
+    updatedAt!: Date;
 
     // Relationships
     @ManyToOne(() => User, (user) => user.ratings)
     @JoinColumn({ name: 'user' })
-    user: Relation<User>;
+    user!: Relation<User>;
 
     @ManyToOne(() => Course, (course) => course.ratings)
     @JoinColumn({ name: 'course' })
-    course: Relation<Course>;
+    course!: Relation<Course>;
 
     @ManyToOne(() => Teacher, (teacher) => teacher.ratings)
     @JoinColumn({ name: 'teacher' })
-    teacher: Relation<Teacher>;
+    teacher!: Relation<Teacher>;
 }
